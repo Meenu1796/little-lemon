@@ -1,15 +1,19 @@
 package com.coursera.capstone
 
+import android.content.Context
 import android.provider.CalendarContract
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -25,23 +29,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun Onboarding() {
+fun Onboarding(navController: NavHostController) {
     val context = LocalContext.current
-    var firstname by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var lastname by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var email by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
+    var firstname by remember { mutableStateOf("") }
+    var lastname by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+
+    var statusMessage by remember { mutableStateOf("") }
+    var isSuccess     by remember { mutableStateOf(false) }
+
     Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(20.dp)
     ) {
         Image(
             modifier = Modifier.width(100.dp).height(100.dp),
@@ -49,31 +55,63 @@ fun Onboarding() {
             contentDescription = "Logo"
         )
         Text(text="Let's get to know you", modifier = Modifier.padding(10.dp),)
-        TextField(
+
+        OutlinedTextField(
             value = firstname,
             onValueChange = {firstname = it},
             label = {Text(text = "First name") },
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier
+                .padding(top = 16.dp)
         )
-        TextField(
+        OutlinedTextField(
             value = lastname,
             onValueChange = {lastname = it},
             label = {Text(text = "Last name") },
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier
+                .padding(top = 8.dp)
         )
-        TextField(
+        OutlinedTextField(
             value = email,
             onValueChange = {email = it},
             label = {Text(text = "Password") },
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier
+                .padding(top = 8.dp)
         )
         Button(
-            onClick = {},
-            colors = ButtonDefaults.buttonColors(
-                Color(0xFF495E57)
-            ),
+            onClick = {
+                if (firstname.isBlank() || lastname.isBlank() || email.isBlank()) {
+                    isSuccess = false
+                    statusMessage = "Registration unsuccessful. Please enter all data."
+                } else {
+                    // Persist user data in SharedPreferences
+                    val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                    prefs.edit()
+                        .putString("first_name", firstname)
+                        .putString("last_name", lastname)
+                        .putString("email", email)
+                        .apply()
+
+                    isSuccess = true
+                    statusMessage = "Registration successful!"
+
+                    // Navigate to Home, removing Onboarding from the back stack
+                    navController.navigate(Home.route) {
+                        popUpTo(Onboarding.route) { inclusive = true }
+                    }
+                }
+            },
+            modifier = Modifier.padding(top = 16.dp)
         ) {
-            Text(text = "Button", color = Color(0xFFEDEFEE))
+            Text(text = "Register")
+        }
+
+        // Status feedback message
+        if (statusMessage.isNotEmpty()) {
+            Text(
+                text = statusMessage,
+                color = if (isSuccess) Color(0xFF4CAF50) else Color(0xFFF44336),
+                modifier = Modifier.padding(top = 12.dp)
+            )
         }
     }
 }
@@ -81,5 +119,5 @@ fun Onboarding() {
 @Preview(showBackground = true)
 @Composable
 fun OnboardingPreview() {
-    Onboarding()
+    Onboarding(navController = rememberNavController())
 }
