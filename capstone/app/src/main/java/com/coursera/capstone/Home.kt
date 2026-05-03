@@ -3,6 +3,7 @@ package com.coursera.capstone
 import android.R.attr.clickable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -126,27 +128,39 @@ fun Header(navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable {
-            navController.navigate(Profile.route)
-        },
+            .padding(top = 56.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(modifier = Modifier.weight(1f))
         // Logo - replace R.drawable.logo with your actual logo resource
+        Image(
+            painter = painterResource(id=R.drawable.logo),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .size(40.dp)
+                .padding(end = 8.dp),
+            contentScale = ContentScale.Crop
+        )
         Text(
             text = "Little Lemon",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.DarkGreen)
         )
-//        Image(
-//            painter = painterResource(id=R.drawable.logo),
-//            contentDescription = "Logo",
-//            modifier = Modifier
-//                .size(10.dp),
-//            contentScale = ContentScale.Crop
-//        )
         Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(id = R.drawable.profile),
+            contentDescription = "User Image",
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .border(2.dp, Color.Gray, CircleShape)
+                .clickable {
+                    navController.navigate(Profile.route)
+                },
+            contentScale = ContentScale.Crop
+        )
+
     }
 }
 
@@ -195,6 +209,7 @@ fun HeroSection(
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
+        Spacer(modifier = Modifier.height(12.dp))
         TextField(
             value = searchPhrase,
             onValueChange = onSearchChange,
