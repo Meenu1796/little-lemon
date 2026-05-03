@@ -18,7 +18,7 @@ import androidx.navigation.compose.composable
  * @param navController The [NavHostController] created in [MainActivity].
  */
 @Composable
-fun MyNavigation(navController: NavHostController) {
+fun MyNavigation(navController: NavHostController, database: AppDatabase) {
     val context = LocalContext.current
 
     // Evaluate start destination only once, avoiding re-computation on recomposition
@@ -30,7 +30,7 @@ fun MyNavigation(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
     ) {
 
         composable(Onboarding.route) {
@@ -38,7 +38,7 @@ fun MyNavigation(navController: NavHostController) {
         }
 
         composable(Home.route) {
-            Home(navController = navController)
+            Home(navController = navController,database=database)
         }
 
         composable(Profile.route) {
